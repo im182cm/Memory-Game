@@ -10,6 +10,13 @@ var moveCount = 0;
 var startTime = 0;
 //Variable to pervent race conditions.
 var semaphore = false;
+
+var notMatchedSrc = 'https://www.pngkey.com/png/detail/18-184185_meme-pepethefrog-pepe-frog-depressed-fat-ugly-memes.png';
+var matchedSrc = 'https://i.imgflip.com/8uinm.jpg';
+var popupImage = new Image(300, 300);
+popupImage.style.cssText = "position: fixed; display: none; margin: auto; z-index: 2;"
+document.body.querySelector('.container').appendChild(popupImage);
+
 /*
  * Display the cards on the page
  *   - shuffle the list of cards using the provided "shuffle" method below
@@ -75,8 +82,10 @@ function showCard(event) {
 	if(tempOpendCardArray.length > 0) {
 		if(tempOpendCardArray[0].firstElementChild.className === targetClassName) {
 			lockCardAsOpened(target);
+			setTimeout(showPopupImage, 500, true);
 		} else {
 			semaphore = true;
+			setTimeout(showPopupImage, 500, false);
 			setTimeout(reverseCard, 500, target);
 		}
 		updateCountAndStars();
@@ -153,4 +162,17 @@ function showCongratsPopup() {
 		location.reload();
 	} else {
 	}
+}
+
+function showPopupImage(matched) {
+	if(matched) {
+		popupImage.src = matchedSrc;
+	} else {
+		popupImage.src = notMatchedSrc;
+	}
+	popupImage.style.display = "block";
+
+	setTimeout(function() {
+		popupImage.style.display = "none";
+	}, 300);
 }

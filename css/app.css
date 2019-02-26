@@ -107,3 +107,15 @@ h1 {
     float: right;
     cursor: pointer;
 }
+
+.modal-image {
+    bottom: 0;
+    height: 100px;
+    left: 0;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    z-index: 1
+}
