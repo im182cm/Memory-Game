@@ -17,6 +17,28 @@ var popupImage = new Image(300, 300);
 popupImage.style.cssText = "position: fixed; display: none; margin: auto; z-index: 2;"
 document.body.querySelector('.container').appendChild(popupImage);
 
+var timer;
+
+class StopWatch {
+	constructor(startTime, element){
+		this.startTime = startTime;
+		this.element = element;
+	}
+
+	start(){
+		this.interval = setInterval(this.update, 1000, this.element);
+	}
+
+	stop() {
+		clearInterval(this.interval);
+		return msToTime(performance.now() - startTime);
+	}
+
+	update(element) {
+		element.textContent = msToTime(performance.now() - startTime);
+	}
+};
+
 /*
  * Display the cards on the page
  *   - shuffle the list of cards using the provided "shuffle" method below
@@ -34,6 +56,7 @@ function init(){
 		});
 	}
 	document.querySelector('.moves').textContent = moveCount;
+	document.getElementById('time').textContent = msToTime(0);
 }
 
 init();
@@ -60,14 +83,16 @@ function shuffle(array) {
  * Show the card is clicked.
  */
 function showCard(event) {
+	if(event.target !== event.currentTarget) return;
 	//If reversing the card.
 	if(semaphore)
 		return;
 
 	//Set start time once.
 	if(startTime == 0) {
-		startTime = performance.now();
+		stopWatch(true);
 	}
+
 	var target = event.target;
 
 	//If a card which is already matched or the same card is clicked.
@@ -91,6 +116,19 @@ function showCard(event) {
 		updateCountAndStars();
 	} else {
 		tempOpendCardArray.push(target);
+	}
+}
+
+/*
+ * Show timer
+ */
+function stopWatch(shouldStart){
+	if(shouldStart) {
+		startTime = performance.now();
+		timer = new StopWatch(startTime, document.getElementById('time'));
+		timer.start();
+	} else {
+		return timer.stop();
 	}
 }
 
@@ -124,7 +162,7 @@ function updateCountAndStars() {
 	}
 
 	if(checkGameFinishied()){
-		setTimeout(showCongratsPopup, 500);
+		setTimeout(showCongratsPopup, 500, stopWatch(false));
 	}
 }
 
@@ -139,8 +177,7 @@ function checkGameFinishied() {
  * Change milisecond to readable time.
  */
 function msToTime(duration) {
-  var milliseconds = parseInt((duration % 1000) / 100),
-    seconds = parseInt((duration / 1000) % 60),
+  var seconds = parseInt((duration / 1000) % 60),
     minutes = parseInt((duration / (1000 * 60)) % 60),
     hours = parseInt((duration / (1000 * 60 * 60)) % 24);
 
@@ -148,17 +185,17 @@ function msToTime(duration) {
   minutes = (minutes < 10) ? "0" + minutes : minutes;
   seconds = (seconds < 10) ? "0" + seconds : seconds;
 
-  return hours + ":" + minutes + ":" + seconds + "." + milliseconds;
+  return hours + ":" + minutes + ":" + seconds;
 }
 
 /*
  * Show modal popup.
  */
-function showCongratsPopup() {
-	var endTime = performance.now();
-	var playTime = msToTime(endTime - startTime);
+function showCongratsPopup(finishedTime) {
+	//var endTime = performance.now();
+	//var playTime = msToTime(endTime - startTime);
 	var starsCount = document.querySelector('.stars').childElementCount;
-	if (confirm("Congrats!\nYour Score :\nTime: "+playTime+"\nMoves: "+moveCount+"\nStars: "+starsCount+"\n\nDo you want to play again?")) {
+	if (confirm("Congrats!\nYour Score :\nTime: "+finishedTime+"\nMoves: "+moveCount+"\nStars: "+starsCount+"\n\nDo you want to play again?")) {
 		location.reload();
 	} else {
 	}

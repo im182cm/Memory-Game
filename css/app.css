@@ -108,6 +108,11 @@ h1 {
     cursor: pointer;
 }
 
+.score-panel .timer {
+    display: inline-block;
+    margin: 0 0 0 20px;
+}
+
 .modal-image {
     bottom: 0;
     height: 100px;
